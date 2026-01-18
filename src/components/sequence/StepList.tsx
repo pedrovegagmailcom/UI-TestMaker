@@ -14,6 +14,7 @@ import type { SequenceStep } from '../../types/sequence'
 type StepListProps = {
   steps: SequenceStep[]
   selectedStepId: string | null
+  activeStepId: string | null
   isDragDisabled: boolean
   onSelect: (stepId: string) => void
   onReorder: (activeId: string, overId: string) => void
@@ -22,6 +23,7 @@ type StepListProps = {
 export function StepList({
   steps,
   selectedStepId,
+  activeStepId,
   isDragDisabled,
   onSelect,
   onReorder,
@@ -51,6 +53,7 @@ export function StepList({
               key={step.id}
               step={step}
               isSelected={step.id === selectedStepId}
+              isActive={step.id === activeStepId}
               isDragDisabled={isDragDisabled}
               onSelect={onSelect}
             />
