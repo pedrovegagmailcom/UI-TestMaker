@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { StepList } from './sequence/StepList'
-import { useSequenceStore, type StepType } from '../store/sequenceStore'
+import { useSequenceStore } from '../store/sequenceStore'
+import type { StepType } from '../types/sequence'
 
 type SequencePanelProps = {
   readOnly: boolean

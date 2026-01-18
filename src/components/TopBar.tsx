@@ -1,4 +1,5 @@
 import { useRunStore } from '../store/runStore'
+import { useSequenceStore } from '../store/sequenceStore'
 
 const statusStyles: Record<string, string> = {
   READY: 'bg-emerald-500/20 text-emerald-200 border-emerald-400/40',
@@ -10,11 +11,13 @@ const statusStyles: Record<string, string> = {
 
 export function TopBar() {
   const { runState, start, pause, stop, abort } = useRunStore()
+  const { steps } = useSequenceStore()
   const isReady = runState === 'READY'
   const isRunning = runState === 'RUNNING'
   const isPaused = runState === 'PAUSED'
+  const errorCount = steps.filter((step) => step.enabled && step.hasError).length
 
-  const canStart = isReady
+  const canStart = isReady && errorCount === 0
   const canPause = isRunning
   const canStop = isRunning || isPaused
   const canAbort = isRunning || isPaused
@@ -46,7 +49,9 @@ export function TopBar() {
         </div>
         <div>
           <p className="text-[11px] uppercase tracking-[0.25em] text-slate-500">Validation</p>
-          <p className="font-semibold">2 warnings</p>
+          <p className="font-semibold">
+            {errorCount === 0 ? 'No errors' : `${errorCount} error${errorCount === 1 ? '' : 's'}`}
+          </p>
         </div>
       </div>
 
