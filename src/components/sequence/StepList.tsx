@@ -9,7 +9,7 @@ import {
 } from '@dnd-kit/core'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { StepListItem } from './StepListItem'
-import type { SequenceStep } from '../../store/sequenceStore'
+import type { SequenceStep } from '../../types/sequence'
 
 type StepListProps = {
   steps: SequenceStep[]

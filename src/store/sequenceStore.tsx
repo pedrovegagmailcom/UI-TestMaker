@@ -1,14 +1,7 @@
 import { createContext, useContext, useMemo, useRef, useState, type ReactNode } from 'react'
-
-export type StepType = 'Ramp' | 'Hold' | 'Cyclic' | 'Return' | 'Stop'
-
-export type SequenceStep = {
-  id: string
-  type: StepType
-  label: string
-  enabled: boolean
-  hasError: boolean
-}
+import type { EndCriterion, SequenceStep, StepParameters, StepType } from '../types/sequence'
+import { controlModes } from '../types/sequence'
+import { stepSchema, type StepFormValues } from '../validation/stepValidation'
 
 type SequenceStore = {
   steps: SequenceStep[]
@@ -19,6 +12,7 @@ type SequenceStore = {
   selectStep: (stepId: string) => void
   toggleStepEnabled: (stepId: string) => void
   reorderSteps: (activeId: string, overId: string) => void
+  updateStep: (step: StepFormValues) => void
 }
 
 const SequenceStoreContext = createContext<SequenceStore | null>(null)
@@ -31,12 +25,52 @@ const stepTypeLabels: Record<StepType, string> = {
   Stop: 'Stop sequence',
 }
 
+const defaultCriteria = (): EndCriterion[] => [
+  { id: `EC-${Math.random().toString(36).slice(2, 8)}`, type: 'Time', enabled: true, value: 30 },
+]
+
+const defaultParameters = (type: StepType): StepParameters => {
+  switch (type) {
+    case 'Ramp':
+      return { rate: 1.2, target: 5 }
+    case 'Hold':
+      return { target: 40, holdTime: 60 }
+    case 'Cyclic':
+      return { rate: 2.5, target: 3, cycles: 10 }
+    case 'Return':
+      return { rate: 1, target: 1 }
+    case 'Stop':
+    default:
+      return {}
+  }
+}
+
+const applyValidation = (step: SequenceStep): SequenceStep => {
+  const result = stepSchema.safeParse(step)
+  return { ...step, hasError: !result.success }
+}
+
+const createStep = (id: string, type: StepType, overrides?: Partial<SequenceStep>): SequenceStep => {
+  const label = stepTypeLabels[type]
+  const baseStep: SequenceStep = {
+    id,
+    type,
+    label,
+    enabled: true,
+    hasError: false,
+    controlMode: controlModes[0],
+    parameters: defaultParameters(type),
+    endCriteria: defaultCriteria(),
+  }
+  return applyValidation({ ...baseStep, ...overrides })
+}
+
 const initialSteps: SequenceStep[] = [
-  { id: 'S01', type: 'Ramp', label: 'Ramp voltage', enabled: true, hasError: false },
-  { id: 'S02', type: 'Hold', label: 'Hold temperature', enabled: true, hasError: false },
-  { id: 'S03', type: 'Cyclic', label: 'Cyclic load', enabled: true, hasError: true },
-  { id: 'S04', type: 'Return', label: 'Return to baseline', enabled: false, hasError: false },
-  { id: 'S05', type: 'Stop', label: 'Stop sequence', enabled: true, hasError: false },
+  createStep('S01', 'Ramp'),
+  createStep('S02', 'Hold'),
+  createStep('S03', 'Cyclic'),
+  createStep('S04', 'Return', { enabled: false }),
+  createStep('S05', 'Stop'),
 ]
 
 const createStepId = (index: number) => `S${String(index).padStart(2, '0')}`
@@ -56,14 +90,7 @@ export function SequenceStoreProvider({ children }: { children: ReactNode }) {
   const addStep = (type: StepType) => {
     const nextId = createStepId(nextIdRef.current)
     nextIdRef.current += 1
-    const label = stepTypeLabels[type]
-    const newStep: SequenceStep = {
-      id: nextId,
-      type,
-      label,
-      enabled: true,
-      hasError: false,
-    }
+    const newStep = createStep(nextId, type)
     setSteps((current) => [...current, newStep])
     setSelectedStepId(newStep.id)
   }
@@ -83,7 +110,7 @@ export function SequenceStoreProvider({ children }: { children: ReactNode }) {
         label: `${source.label} copy`,
       }
       const next = [...current]
-      next.splice(index + 1, 0, duplicate)
+      next.splice(index + 1, 0, applyValidation(duplicate))
       setSelectedStepId(duplicate.id)
       return next
     })
@@ -125,6 +152,14 @@ export function SequenceStoreProvider({ children }: { children: ReactNode }) {
     })
   }
 
+  const updateStep = (updatedStep: StepFormValues) => {
+    setSteps((current) =>
+      current.map((step) =>
+        step.id === updatedStep.id ? applyValidation({ ...step, ...updatedStep }) : step,
+      ),
+    )
+  }
+
   const value = useMemo<SequenceStore>(
     () => ({
       steps,
@@ -135,6 +170,7 @@ export function SequenceStoreProvider({ children }: { children: ReactNode }) {
       selectStep,
       toggleStepEnabled,
       reorderSteps,
+      updateStep,
     }),
     [steps, selectedStepId],
   )
