@@ -3,6 +3,7 @@ import { PropertiesPanel } from './components/PropertiesPanel'
 import { SequencePanel } from './components/SequencePanel'
 import { TopBar } from './components/TopBar'
 import { RunStoreProvider, useRunStore } from './store/runStore'
+import { SequenceStoreProvider } from './store/sequenceStore'
 
 function MainLayout() {
   const { runState } = useRunStore()
@@ -30,7 +31,9 @@ function MainLayout() {
 function App() {
   return (
     <RunStoreProvider>
-      <MainLayout />
+      <SequenceStoreProvider>
+        <MainLayout />
+      </SequenceStoreProvider>
     </RunStoreProvider>
   )
 }
