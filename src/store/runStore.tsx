@@ -6,6 +6,7 @@ type RunStore = {
   runState: RunState
   start: () => void
   pause: () => void
+  resume: () => void
   stop: () => void
   abort: () => void
   reset: () => void
@@ -21,6 +22,7 @@ export function RunStoreProvider({ children }: { children: ReactNode }) {
       runState,
       start: () => setRunState('RUNNING'),
       pause: () => setRunState('PAUSED'),
+      resume: () => setRunState('RUNNING'),
       stop: () => setRunState('STOPPED'),
       abort: () => setRunState('ABORTED'),
       reset: () => setRunState('READY'),

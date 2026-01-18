@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { StepList } from './sequence/StepList'
 import { useSequenceStore } from '../store/sequenceStore'
+import { useSimulationStore } from '../store/simulationStore'
 import type { StepType } from '../types/sequence'
 
 type SequencePanelProps = {
@@ -10,6 +11,7 @@ type SequencePanelProps = {
 export function SequencePanel({ readOnly }: SequencePanelProps) {
   const { steps, selectedStepId, addStep, duplicateStep, deleteStep, selectStep, toggleStepEnabled, reorderSteps } =
     useSequenceStore()
+  const { activeStepId } = useSimulationStore()
   const [isAddMenuOpen, setIsAddMenuOpen] = useState(false)
   const selectedStep = steps.find((step) => step.id === selectedStepId) ?? null
 
@@ -119,6 +121,7 @@ export function SequencePanel({ readOnly }: SequencePanelProps) {
       <StepList
         steps={steps}
         selectedStepId={selectedStepId}
+        activeStepId={activeStepId}
         isDragDisabled={!canEdit}
         onSelect={selectStep}
         onReorder={reorderSteps}

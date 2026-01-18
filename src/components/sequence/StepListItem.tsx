@@ -5,11 +5,12 @@ import type { SequenceStep } from '../../types/sequence'
 type StepListItemProps = {
   step: SequenceStep
   isSelected: boolean
+  isActive: boolean
   isDragDisabled: boolean
   onSelect: (stepId: string) => void
 }
 
-export function StepListItem({ step, isSelected, isDragDisabled, onSelect }: StepListItemProps) {
+export function StepListItem({ step, isSelected, isActive, isDragDisabled, onSelect }: StepListItemProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: step.id,
     disabled: isDragDisabled,
@@ -27,7 +28,9 @@ export function StepListItem({ step, isSelected, isDragDisabled, onSelect }: Ste
       className={`flex items-center gap-3 rounded-lg border px-3 py-3 text-left transition ${
         isSelected
           ? 'border-indigo-400/70 bg-indigo-500/10'
-          : 'border-slate-800 bg-slate-950/60'
+          : isActive
+            ? 'border-emerald-400/60 bg-emerald-500/10'
+            : 'border-slate-800 bg-slate-950/60'
       } ${isDragging ? 'opacity-70' : ''}`}
       role="listitem"
     >
@@ -42,6 +45,11 @@ export function StepListItem({ step, isSelected, isDragDisabled, onSelect }: Ste
             <span className="rounded-full border border-slate-700 px-2 py-0.5 text-[10px] uppercase tracking-[0.18em] text-slate-500">
               {step.type}
             </span>
+            {isActive && (
+              <span className="rounded-full border border-emerald-400/70 px-2 py-0.5 text-[10px] uppercase tracking-[0.18em] text-emerald-200">
+                Live
+              </span>
+            )}
             {!step.enabled && (
               <span className="rounded-full border border-slate-700 px-2 py-0.5 text-[10px] uppercase tracking-[0.18em] text-slate-500">
                 Disabled
