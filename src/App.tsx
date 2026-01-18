@@ -16,6 +16,30 @@ const featureList = [
   },
 ]
 
+const readinessMetrics = [
+  {
+    label: 'UI flows automated',
+    value: '38',
+    detail: 'Critical paths for onboarding, billing, and reporting.',
+  },
+  {
+    label: 'Regression time',
+    value: '18 min',
+    detail: 'Average runtime across the full nightly suite.',
+  },
+  {
+    label: 'Flake rate',
+    value: '0.7%',
+    detail: 'Stabilized via network mocks and retry heuristics.',
+  },
+]
+
+const readinessChecklist = [
+  'Validate dark mode, light mode, and high-contrast themes.',
+  'Confirm mobile breakpoints on iOS and Android viewports.',
+  'Review visual diffs for the top 10 conversion flows.',
+]
+
 function App() {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100">
@@ -62,6 +86,56 @@ function App() {
               </p>
             </article>
           ))}
+        </section>
+
+        <section className="grid w-full gap-8 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
+          <div className="space-y-6 rounded-3xl border border-slate-800 bg-gradient-to-br from-slate-900/80 via-slate-950/70 to-slate-950/40 p-8">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-indigo-300">
+                Release readiness
+              </p>
+              <h2 className="mt-3 text-2xl font-semibold text-slate-100">
+                Every merge ships with confidence.
+              </h2>
+              <p className="mt-3 text-sm text-slate-300">
+                UI TestMaker keeps product teams aligned with actionable metrics and
+                a consistent pre-launch checklist.
+              </p>
+            </div>
+            <div className="space-y-3">
+              {readinessChecklist.map((item) => (
+                <div key={item} className="flex items-start gap-3 text-sm text-slate-200">
+                  <span className="mt-1 h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_12px_rgba(52,211,153,0.6)]" />
+                  <span>{item}</span>
+                </div>
+              ))}
+            </div>
+            <div className="flex flex-wrap gap-3 text-sm">
+              <button className="rounded-full bg-indigo-500 px-5 py-2 font-semibold text-slate-950 transition hover:bg-indigo-400">
+                Start a test run
+              </button>
+              <button className="rounded-full border border-slate-700 px-5 py-2 font-semibold text-slate-200 transition hover:border-slate-500">
+                View the checklist
+              </button>
+            </div>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-3">
+            {readinessMetrics.map((metric) => (
+              <article
+                key={metric.label}
+                className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 shadow-lg shadow-black/30"
+              >
+                <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">
+                  {metric.label}
+                </p>
+                <p className="mt-3 text-3xl font-semibold text-slate-100">
+                  {metric.value}
+                </p>
+                <p className="mt-2 text-sm text-slate-400">{metric.detail}</p>
+              </article>
+            ))}
+          </div>
         </section>
 
         <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-slate-400">
